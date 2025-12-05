@@ -100,7 +100,7 @@ _macOS/Linux_
 ```pip install -r requirements.txt```
 
 4. Run the Streamlit Application
-streamlit run app.py
+```streamlit run app.py```
 
 
 This will launch the app in your browser.
@@ -109,23 +109,17 @@ This will launch the app in your browser.
 
 If you want to reproduce the analysis:
 
-jupyter notebook solution.ipynb
+```jupyter notebook solution.ipynb```
 
 📦 Requirements
 
 All required libraries are listed in requirements.txt and include:
-
-pandas
-
-numpy
-
-scikit-learn
-
-matplotlib
-
-seaborn
-
-streamlit
+- pandas
+- numpy
+- scikit-learn
+- matplotlib
+- seaborn
+- streamlit
 
 The project is fully reproducible and follows the coursework specification for environment setup.
 
@@ -138,6 +132,5 @@ See the LICENSE file for details.
 
 This project was completed as part of the Machine Learning & Data Analytics module at the Westminster International University in Tashkent (WIUT).
 
-Student ID: [Your ID goes here]
-Module Code: 6COSC017C-n
-Lecturer: Mukhammadmuso Abduzhabbarov
+Name: Egamberdiyev Sayidjamol
+Student ID: 00015754
