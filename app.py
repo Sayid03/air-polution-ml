@@ -35,10 +35,17 @@ def load_data():
 
 df = load_data()
 
-st.sidebar.header("Navigation")
-page = st.sidebar.selectbox("Go to", ["Data Exploration", "Model Training", "Model Evaluation"])
+# st.sidebar.header("Navigation")
+# page = st.sidebar.selectbox("Go to", ["Data Exploration", "Model Training", "Model Evaluation"])
 
-if page == "Data Exploration":
+tab1, tab2, tab3, tab4 = st.tabs([
+    "📊 Data Exploration",
+    "⚙️ Model Training",
+    "📈 Model Evaluation",
+    "🧮 Live Prediction"
+])
+
+with tab1:
     st.header("Dataset Overview")
     
     st.write("Shape:", df.shape)
@@ -47,13 +54,48 @@ if page == "Data Exploration":
     st.subheader("Summary Statistics")
     st.write(df.describe())
     
-    st.subheader("Histogram Example")
+    st.subheader("Histogram")
     numeric_cols = df.select_dtypes(include=["float64", "int64"]).columns
     col = st.selectbox("Select feature for histogram:", numeric_cols)
     
     st.bar_chart(df[col].dropna())
 
-elif page == "Model Training":
+    # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+    st.subheader("Correlation Heatmap")
+
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    
+    df_numeric = df.select_dtypes(include=['float64', 'int64'])
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+    sns.heatmap(df_numeric.corr(), cmap="coolwarm", annot=False)
+    st.pyplot(fig)
+
+    # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+    st.subheader("Scatter Plot")
+
+    x_feature = st.selectbox("Select X-axis:", df_numeric.columns)
+    y_feature = st.selectbox("Select Y-axis:", df_numeric.columns)
+
+    fig, ax = plt.subplots()
+    ax.scatter(df_numeric[x_feature], df[y_feature], alpha=0.5)
+    ax.set_xlabel(x_feature)
+    ax.set_ylabel(y_feature)
+    st.pyplot(fig)
+
+    # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+    st.subheader("Boxplot")
+
+    col = st.selectbox("Select feature:", df_numeric.columns)
+    fig, ax = plt.subplots()
+    sns.boxplot(df_numeric[col], ax=ax)
+    st.pyplot(fig)
+
+with tab2:
     st.header("Train Models")
 
     st.write("Preparing the data...")
@@ -90,25 +132,34 @@ elif page == "Model Training":
     if st.button("Train Model"):
         if model_choice == "Linear Regression":
             model = LinearRegression()
+            filename = "models/lr_model.pkl"
+
         elif model_choice == "Random Forest":
             model = RandomForestRegressor(n_estimators=200, random_state=42)
+            filename = "models/rf_model.pkl"
+
         else:
-            model = SVR(kernel='rbf', C=10, epsilon=0.1)
+            model = SVR(kernel="rbf", C=10, epsilon=0.1)
+            filename = "models/svr_model.pkl"
 
         model.fit(X_train, y_train)
 
-        # Save model
-        with open("trained_model.pkl", "wb") as f:
+        with open(filename, "wb") as f:
             pickle.dump(model, f)
 
-        st.success("Model trained and saved!")
+        st.success(f"{model_choice} saved as {filename}")
 
-elif page == "Model Evaluation":
-    st.header("Evaluate Trained Model")
+with tab3:
+    st.subheader("Choose Model to Evaluate")
+
+    model_file = st.selectbox(
+        "Select model file:",
+        ["models/lr_model.pkl", "models/rf_model.pkl", "models/svr_model.pkl"]
+    )
 
     try:
-        with open("trained_model.pkl", "rb") as f:
-            model = pickle.load(f)
+        with open(model_file, "rb") as f:
+            model = pickle.load(f) 
     except:
         st.error("No trained model found. Please train a model first.")
         st.stop()
@@ -161,3 +212,31 @@ elif page == "Model Evaluation":
     st.write("**MSE:**", mean_squared_error(y_eval, y_pred))
     st.write("**RMSE:**", np.sqrt(mean_squared_error(y_eval, y_pred)))
     st.write("**R² Score:**", r2_score(y_eval, y_pred))
+
+with tab4:
+    st.header("🔮 Live Prediction")
+
+    try:
+        with open("models/rf_model.pkl", "rb") as f:
+            model = pickle.load(f)
+    except:
+        st.error("Train and save a model first!")
+        st.stop()
+
+    # Dynamic numeric inputs
+    st.subheader("Enter sensor measurements:")
+
+    inputs = {}
+    for col in X.columns:  # X is your final feature set
+        inputs[col] = st.number_input(
+            col,
+            min_value=float(df[col].min()),
+            max_value=float(df[col].max()),
+            value=float(df[col].median())
+        )
+
+    input_df = pd.DataFrame([inputs])
+
+    if st.button("Predict"):
+        pred = model.predict(input_df)[0]
+        st.success(f"Predicted Benzene Concentration (C6H6): **{pred:.2f} µg/m³**")
