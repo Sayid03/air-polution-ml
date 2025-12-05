@@ -11,6 +11,7 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 st.title("Air Quality ML Dashboard")
 
+# Cashing data
 @st.cache_data
 def load_data():
     df = pd.read_csv("dataset/AirQualityUCI.csv", sep=';',  decimal=',', na_values=-200)
@@ -38,6 +39,7 @@ df = load_data()
 # st.sidebar.header("Navigation")
 # page = st.sidebar.selectbox("Go to", ["Data Exploration", "Model Training", "Model Evaluation"])
 
+# Nav pannel
 tab1, tab2, tab3, tab4 = st.tabs([
     "📊 Data Exploration",
     "⚙️ Model Training",
@@ -45,6 +47,7 @@ tab1, tab2, tab3, tab4 = st.tabs([
     "🧮 Live Prediction"
 ])
 
+# Data Exploration
 with tab1:
     st.header("Dataset Overview")
     
@@ -95,6 +98,7 @@ with tab1:
     sns.boxplot(df_numeric[col], ax=ax)
     st.pyplot(fig)
 
+# Model Training
 with tab2:
     st.header("Train Models")
 
@@ -149,6 +153,7 @@ with tab2:
 
         st.success(f"{model_choice} saved as {filename}")
 
+# Model Evaluation
 with tab3:
     st.subheader("Choose Model to Evaluate")
 
@@ -213,8 +218,9 @@ with tab3:
     st.write("**RMSE:**", np.sqrt(mean_squared_error(y_eval, y_pred)))
     st.write("**R² Score:**", r2_score(y_eval, y_pred))
 
+# Live Prediction
 with tab4:
-    st.header("🔮 Live Prediction")
+    st.header("Live Prediction")
 
     try:
         with open("models/rf_model.pkl", "rb") as f:
