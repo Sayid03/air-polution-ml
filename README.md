@@ -82,21 +82,19 @@ Random Forest achieved the highest predictive accuracy.
 
 ▶️ How to Run the Project
 1. Clone the Repository
-git clone <your-repo-url>
-cd <your-project-folder>
+```git clone <your-repo-url>```
+```cd <your-project-folder>```
 
 2. Create and Activate Virtual Environment (Recommended)
 
 _Windows_
-
-python -m venv venv
-venv\Scripts\activate
+```python -m venv venv```
+```venv\Scripts\activate```
 
 
 _macOS/Linux_
-
-python3 -m venv venv
-source venv/bin/activate
+```python3 -m venv venv```
+```source venv/bin/activate```
 
 3. Install Dependencies
 ```pip install -r requirements.txt```
